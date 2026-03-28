@@ -1653,44 +1653,47 @@ function computeResult() {
 // ═══════════════════════════════════════════════
 //  EXPORT TO CSV (visible to creator)
 // ═══════════════════════════════════════════════
+//  ⚠️ REMPLACE CETTE URL PAR TON URL APPS SCRIPT
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw5imDM9c4vE6O09DDuyKn30w2mKzQ_dGc7k_h15gSsKdCKT-KnnuSwA3MmzgC3pxWH/exec';
+// ═══════════════════════════════════════════════
+
 function submitResults() {
   const result = computeResult();
-  const row = {
-    'Nom': state.name,
-    'Pseudo': state.pseudo,
-    'Genre': state.gender,
-    'Nb Participants': state.participantCount,
-    'Dispo Fin Août': state.answers.dispo ? 'Oui' : 'Non',
-    'Motivation': state.answers.motivation || '',
-    'Lieux': state.answers.lieux ? Object.keys(state.answers.lieux).join(', ') : '',
-    'Logement': state.answers.logement ? Object.keys(state.answers.logement).join(', ') : '',
-    'Activités': state.answers.activites ? Object.keys(state.answers.activites).join(', ') : '',
-    'Bouffe': state.answers.bouffe ? Object.keys(state.answers.bouffe).join(', ') : '',
-    'Quête Ultime': state.answers.folie || '',
-    'Message Boîte à Souvenirs': state.answers.memoryMsg || '',
-    'Lieux - Autre': state.answers.lieux ? (state.answers.lieux['_autre_text'] || '') : '',
-    'Logement - Autre': state.answers.logement ? (state.answers.logement['_autre_text'] || '') : '',
-    'Activités - Autre': state.answers.activites ? (state.answers.activites['_autre_text'] || '') : '',
-    'Score': state.score,
-    'Passages': state.skipCount,
-    'Personnage': result.title,
-    'Boîte à Souvenirs': state.memoryBox ? 'Oui' : 'Non',
-    'Date': new Date().toLocaleString('fr-FR')
+
+  const payload = {
+    date: new Date().toLocaleString('fr-FR'),
+    nom: state.name,
+    pseudo: state.pseudo,
+    genre: state.gender,
+    nbParticipants: state.participantCount,
+    dispoAout: state.answers.dispo ? 'Oui' : 'Non',
+    motivation: state.answers.motivation || '',
+    lieux: state.answers.lieux ? Object.keys(state.answers.lieux).filter(k => !k.startsWith('_')).join(', ') : '',
+    logement: state.answers.logement ? Object.keys(state.answers.logement).filter(k => !k.startsWith('_')).join(', ') : '',
+    activites: state.answers.activites ? Object.keys(state.answers.activites).filter(k => !k.startsWith('_')).join(', ') : '',
+    bouffe: state.answers.bouffe ? Object.keys(state.answers.bouffe).filter(k => !k.startsWith('_')).join(', ') : '',
+    queteUltime: state.answers.folie || '',
+    messageBoite: state.answers.memoryMsg || '',
+    lieuxAutre: state.answers.lieux ? (state.answers.lieux['_autre_text'] || '') : '',
+    logementAutre: state.answers.logement ? (state.answers.logement['_autre_text'] || '') : '',
+    activitesAutre: state.answers.activites ? (state.answers.activites['_autre_text'] || '') : '',
+    score: state.score,
+    passages: state.skipCount,
+    personnage: result.title,
+    boiteASouvenirs: state.memoryBox ? 'Oui' : 'Non'
   };
 
-  // Build CSV
-  const headers = Object.keys(row);
-  const values = Object.values(row).map(v => `"${String(v).replace(/"/g,'""')}"`);
-  const csv = headers.join(';') + '\n' + values.join(';');
-
-  // Download
-  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = `quete_5ans_${state.name.replace(/\s+/g,'_')}_${Date.now()}.csv`;
-  a.click(); URL.revokeObjectURL(url);
-
   navigate('submitted');
+
+  // Envoi en arrière-plan (non-bloquant)
+  if (APPS_SCRIPT_URL && APPS_SCRIPT_URL !== 'COLLE_TON_URL_ICI') {
+    fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).catch(() => {}); // silencieux si hors ligne
+  }
 }
 
 // ═══════════════════════════════════════════════
