@@ -1,0 +1,1722 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>⚔️ La Quête des 5 Ans</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=MedievalSharp&family=Cinzel:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+
+  :root {
+    --bark: #2C1810;
+    --bark-mid: #4A2C1A;
+    --bark-light: #6B3D22;
+    --wood: #8B5E3C;
+    --wood-light: #C4956A;
+    --moss: #4A5E3A;
+    --moss-light: #7A9A5A;
+    --gold: #D4A843;
+    --gold-bright: #F0C84A;
+    --ember: #FF6B35;
+    --ember-glow: #FF9B35;
+    --wisp-blue: #4FC3F7;
+    --wisp-teal: #26C6DA;
+    --parchment: #F5E6C8;
+    --parchment-dark: #D4C4A0;
+    --ink: #1A0F08;
+    --shadow: rgba(0,0,0,0.6);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Crimson Text', Georgia, serif;
+    background: var(--bark);
+    color: var(--parchment);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* ═══════════════ BACKGROUND FOREST ═══════════════ */
+  .forest-bg {
+    position: fixed; inset: 0; z-index: 0;
+    background: 
+      radial-gradient(ellipse at 20% 80%, rgba(74,94,58,0.3) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(44,24,16,0.8) 0%, transparent 60%),
+      linear-gradient(180deg, #0D0805 0%, #1A0F08 30%, #2C1810 60%, #1A0A05 100%);
+    overflow: hidden;
+  }
+
+  .tree {
+    position: absolute; bottom: 0;
+    width: 0; height: 0;
+    border-left: solid transparent;
+    border-right: solid transparent;
+    border-bottom: solid;
+    border-bottom-color: rgba(20,40,15,0.7);
+  }
+  .tree::after {
+    content: '';
+    position: absolute;
+    bottom: -30px; left: 50%;
+    transform: translateX(-50%);
+    width: 12px; height: 30px;
+    background: #2C1810;
+    border-radius: 2px;
+  }
+
+  /* Stars */
+  .stars { position: absolute; inset: 0; }
+  .star {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    animation: twinkle var(--d, 3s) ease-in-out infinite;
+    animation-delay: var(--delay, 0s);
+  }
+  @keyframes twinkle {
+    0%,100% { opacity: 0.2; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.3); }
+  }
+
+  /* ═══════════════ WILL-O-WISPS ═══════════════ */
+  .wisp {
+    position: fixed;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 100;
+    filter: blur(2px);
+  }
+  .wisp-1 {
+    background: radial-gradient(circle, #fff 10%, var(--wisp-blue) 40%, transparent 70%);
+    box-shadow: 0 0 15px 8px rgba(79,195,247,0.6), 0 0 30px 15px rgba(79,195,247,0.3);
+    animation: wisp1-float 8s ease-in-out infinite, wisp1-move 12s ease-in-out infinite;
+  }
+  .wisp-2 {
+    background: radial-gradient(circle, #fff 10%, var(--wisp-teal) 40%, transparent 70%);
+    box-shadow: 0 0 15px 8px rgba(38,198,218,0.6), 0 0 30px 15px rgba(38,198,218,0.3);
+    animation: wisp2-float 6s ease-in-out infinite, wisp2-move 15s ease-in-out infinite;
+  }
+  @keyframes wisp1-float {
+    0%,100% { transform: translateY(0) scale(1); }
+    33% { transform: translateY(-12px) scale(1.1); }
+    66% { transform: translateY(6px) scale(0.9); }
+  }
+  @keyframes wisp1-move {
+    0% { left: 10%; top: 20%; }
+    25% { left: 80%; top: 15%; }
+    50% { left: 70%; top: 50%; }
+    75% { left: 20%; top: 60%; }
+    100% { left: 10%; top: 20%; }
+  }
+  @keyframes wisp2-float {
+    0%,100% { transform: translateY(0) scale(1); }
+    40% { transform: translateY(10px) scale(1.15); }
+    70% { transform: translateY(-8px) scale(0.85); }
+  }
+  @keyframes wisp2-move {
+    0% { left: 75%; top: 70%; }
+    20% { left: 30%; top: 80%; }
+    45% { left: 15%; top: 35%; }
+    70% { left: 85%; top: 25%; }
+    100% { left: 75%; top: 70%; }
+  }
+
+  /* Wisp trail particles */
+  .wisp-particle {
+    position: fixed; width: 6px; height: 6px; border-radius: 50%;
+    pointer-events: none; z-index: 99;
+    animation: particle-fade 1.5s ease-out forwards;
+  }
+  @keyframes particle-fade {
+    0% { opacity: 0.8; transform: scale(1); }
+    100% { opacity: 0; transform: scale(0.2) translateY(-20px); }
+  }
+
+  /* ═══════════════ MAIN CONTAINER ═══════════════ */
+  #app {
+    position: relative; z-index: 10;
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center;
+    padding: 20px 16px 120px;
+  }
+
+  /* ═══════════════ DIALOGUE BOX (Pokémon style) ═══════════════ */
+  .dialogue-box {
+    width: 100%; max-width: 500px;
+    background: linear-gradient(145deg, var(--bark-mid), var(--bark));
+    border: 3px solid var(--wood);
+    border-radius: 12px;
+    box-shadow: 
+      inset 0 0 20px rgba(0,0,0,0.5),
+      0 0 30px rgba(139,94,60,0.3),
+      0 4px 20px rgba(0,0,0,0.8);
+    padding: 20px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .dialogue-box::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+  .dialogue-box::after {
+    content: '';
+    position: absolute; top: 3px; left: 3px; right: 3px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--wood-light), transparent);
+  }
+
+  .wood-grain {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+      92deg,
+      transparent 0px,
+      transparent 8px,
+      rgba(139,94,60,0.04) 8px,
+      rgba(139,94,60,0.04) 9px
+    );
+    pointer-events: none;
+  }
+
+  /* ═══════════════ TYPOGRAPHY ═══════════════ */
+  .title-main {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(20px, 5vw, 28px);
+    font-weight: 900;
+    color: var(--gold-bright);
+    text-align: center;
+    text-shadow: 0 0 20px rgba(212,168,67,0.8), 0 2px 4px rgba(0,0,0,0.9);
+    letter-spacing: 3px;
+    margin-bottom: 8px;
+  }
+  .title-sub {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(11px, 3vw, 14px);
+    color: var(--wood-light);
+    text-align: center;
+    letter-spacing: 5px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
+
+  .narrator-text {
+    font-family: 'Crimson Text', serif;
+    font-size: clamp(15px, 4vw, 18px);
+    line-height: 1.7;
+    color: var(--parchment);
+    position: relative; z-index: 1;
+  }
+  .narrator-text .cursor {
+    display: inline-block; width: 10px; height: 18px;
+    background: var(--gold);
+    animation: blink 0.8s step-end infinite;
+    vertical-align: text-bottom; margin-left: 2px;
+  }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+
+  em { color: var(--gold); font-style: italic; }
+  strong { color: var(--ember-glow); font-weight: 600; }
+
+  /* ═══════════════ CORNER ORNAMENTS ═══════════════ */
+  .corner { position: absolute; font-size: 18px; opacity: 0.5; }
+  .corner-tl { top: 8px; left: 10px; }
+  .corner-tr { top: 8px; right: 10px; transform: scaleX(-1); }
+  .corner-bl { bottom: 8px; left: 10px; transform: scaleY(-1); }
+  .corner-br { bottom: 8px; right: 10px; transform: scale(-1); }
+
+  /* ═══════════════ BUTTONS ═══════════════ */
+  .btn-group {
+    display: flex; flex-direction: column; gap: 10px;
+    margin-top: 16px; width: 100%;
+  }
+  .btn-row { display: flex; gap: 10px; }
+  .btn-row .btn-choice { flex: 1; }
+
+  .btn-choice {
+    font-family: 'Crimson Text', serif;
+    font-size: clamp(14px, 3.5vw, 16px);
+    line-height: 1.3;
+    color: var(--parchment);
+    background: linear-gradient(145deg, rgba(74,44,26,0.9), rgba(44,24,16,0.95));
+    border: 2px solid var(--wood);
+    border-radius: 8px;
+    padding: 12px 16px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+  }
+  .btn-choice::before {
+    content: '▸';
+    color: var(--gold);
+    margin-right: 8px;
+    transition: transform 0.2s;
+    display: inline-block;
+  }
+  .btn-choice:hover, .btn-choice:focus {
+    border-color: var(--gold);
+    background: linear-gradient(145deg, rgba(100,60,30,0.9), rgba(60,30,15,0.95));
+    transform: translateX(4px);
+    box-shadow: -4px 0 0 var(--gold), 0 0 20px rgba(212,168,67,0.3);
+    outline: none;
+  }
+  .btn-choice:hover::before { transform: translateX(3px); }
+  .btn-choice.selected {
+    border-color: var(--gold-bright);
+    background: linear-gradient(145deg, rgba(120,80,30,0.9), rgba(80,50,15,0.95));
+    box-shadow: -4px 0 0 var(--gold-bright), 0 0 25px rgba(240,200,74,0.4);
+    color: var(--gold-bright);
+  }
+
+  .btn-primary {
+    font-family: 'Cinzel', serif;
+    font-size: 14px; letter-spacing: 2px;
+    color: var(--ink);
+    background: linear-gradient(145deg, var(--gold-bright), var(--gold));
+    border: none; border-radius: 8px;
+    padding: 14px 28px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    box-shadow: 0 4px 15px rgba(212,168,67,0.4), inset 0 1px 0 rgba(255,255,255,0.3);
+    width: 100%; margin-top: 16px;
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(212,168,67,0.6), inset 0 1px 0 rgba(255,255,255,0.4);
+    background: linear-gradient(145deg, #FFD700, var(--gold-bright));
+  }
+  .btn-primary:active { transform: translateY(0); }
+
+  .btn-nav {
+    font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: 1px;
+    color: var(--wood-light);
+    background: transparent; border: 1px solid var(--bark-light);
+    border-radius: 6px; padding: 8px 16px;
+    cursor: pointer; transition: all 0.2s;
+    text-transform: uppercase;
+  }
+  .btn-nav:hover { border-color: var(--wood-light); color: var(--parchment); }
+
+  /* ═══════════════ INPUT ═══════════════ */
+  .rpg-input {
+    font-family: 'Crimson Text', serif; font-size: 18px;
+    color: var(--parchment);
+    background: rgba(0,0,0,0.4);
+    border: 2px solid var(--wood); border-radius: 8px;
+    padding: 12px 16px; width: 100%;
+    transition: all 0.2s;
+    outline: none;
+  }
+  .rpg-input:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 15px rgba(212,168,67,0.3);
+  }
+  .rpg-input::placeholder { color: rgba(196,149,106,0.5); }
+
+  .input-label {
+    font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: 2px;
+    color: var(--wood-light); text-transform: uppercase;
+    display: block; margin-bottom: 6px; margin-top: 16px;
+  }
+
+  /* Gender select */
+  .gender-group {
+    display: flex; gap: 10px; margin-top: 6px;
+  }
+  .gender-btn {
+    flex: 1; font-family: 'Crimson Text', serif; font-size: 15px;
+    color: var(--parchment);
+    background: rgba(0,0,0,0.4); border: 2px solid var(--wood);
+    border-radius: 8px; padding: 12px 8px;
+    cursor: pointer; text-align: center; transition: all 0.2s;
+  }
+  .gender-btn:hover, .gender-btn.selected {
+    border-color: var(--gold); color: var(--gold);
+    background: rgba(139,94,60,0.2);
+  }
+  .gender-btn .emoji { font-size: 24px; display: block; margin-bottom: 4px; }
+
+  /* ═══════════════ PROGRESSION BAR (Forest scene) ═══════════════ */
+  #progress-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    height: 100px; z-index: 50;
+    pointer-events: none;
+  }
+
+  .progress-scene {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 100px;
+    background: linear-gradient(180deg, transparent 0%, rgba(13,8,5,0.9) 40%, #0D0805 100%);
+  }
+
+  /* Ground */
+  .ground-layer {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 35px;
+    background: linear-gradient(180deg, var(--moss) 0%, var(--bark) 100%);
+    overflow: hidden;
+  }
+  .ground-layer::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, var(--moss-light) 0%, var(--moss) 50%, var(--moss-light) 100%);
+  }
+
+  /* Path fill */
+  .path-fill {
+    position: absolute; bottom: 0; left: 0; height: 35px;
+    background: linear-gradient(90deg, rgba(212,168,67,0.3), rgba(240,200,74,0.15));
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    border-right: 2px solid rgba(212,168,67,0.6);
+  }
+
+  /* SVG Trees in progress bar */
+  .prog-trees {
+    position: absolute; bottom: 30px; left: 0; right: 0; height: 70px;
+    pointer-events: none;
+  }
+  .prog-tree-svg {
+    position: absolute; bottom: 0;
+    transition: opacity 0.5s, filter 0.5s;
+    opacity: 0.35; transform: translateX(-50%);
+  }
+  .prog-tree-svg.passed { opacity: 0.75; }
+  .prog-tree-svg.checkpoint { opacity: 1; filter: drop-shadow(0 0 6px var(--gold)); }
+
+  /* Hero character */
+  #hero {
+    position: absolute; bottom: 33px;
+    width: 20px; height: 28px;
+    transition: left 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 51;
+  }
+  .hero-body {
+    font-size: 22px;
+    animation: hero-walk 0.5s steps(2) infinite;
+  }
+  @keyframes hero-walk {
+    0% { transform: scaleX(1); }
+    50% { transform: scaleX(-1); }
+    100% { transform: scaleX(1); }
+  }
+  #hero.idle .hero-body { animation: none; }
+
+  /* Progress label */
+  #progress-label {
+    position: absolute; top: 8px; right: 12px;
+    font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1px;
+    color: var(--gold); opacity: 0.8;
+    text-transform: uppercase;
+  }
+
+  /* ═══════════════ CHAPTER HEADER ═══════════════ */
+  .chapter-header {
+    width: 100%; max-width: 500px;
+    text-align: center; margin-bottom: 12px;
+    padding-top: 16px;
+  }
+  .chapter-tag {
+    font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 3px;
+    color: var(--wood-light); text-transform: uppercase;
+    border: 1px solid var(--bark-light);
+    padding: 3px 12px; border-radius: 20px;
+    display: inline-block; margin-bottom: 6px;
+  }
+  .chapter-title {
+    font-family: 'Cinzel', serif; font-size: clamp(14px, 4vw, 18px);
+    color: var(--gold); font-weight: 700;
+    text-shadow: 0 0 15px rgba(212,168,67,0.5);
+  }
+
+  /* ═══════════════ SKIP COUNTER ═══════════════ */
+  #skip-counter {
+    position: fixed; top: 12px; right: 12px; z-index: 200;
+    font-family: 'Cinzel', serif; font-size: 10px;
+    color: rgba(196,149,106,0.6);
+    background: rgba(0,0,0,0.5);
+    padding: 4px 10px; border-radius: 20px;
+    border: 1px solid rgba(139,94,60,0.3);
+    display: none;
+  }
+
+  /* ═══════════════ SCREEN TRANSITIONS ═══════════════ */
+  .screen {
+    width: 100%; max-width: 500px;
+    animation: screen-in 0.4s ease-out;
+  }
+  @keyframes screen-in {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ═══════════════ CHARACTER RESULT ═══════════════ */
+  .character-card {
+    text-align: center; padding: 20px 0;
+  }
+  .character-avatar {
+    font-size: 80px; display: block;
+    animation: avatar-glow 2s ease-in-out infinite;
+    filter: drop-shadow(0 0 20px var(--gold));
+  }
+  @keyframes avatar-glow {
+    0%,100% { filter: drop-shadow(0 0 20px var(--gold)); transform: scale(1); }
+    50% { filter: drop-shadow(0 0 40px var(--gold-bright)); transform: scale(1.05); }
+  }
+  .character-class {
+    font-family: 'Cinzel', serif; font-size: 28px; font-weight: 900;
+    color: var(--gold-bright);
+    text-shadow: 0 0 30px rgba(240,200,74,0.8);
+    margin: 12px 0 4px;
+  }
+  .character-desc {
+    font-style: italic; color: var(--parchment-dark);
+    font-size: 15px; line-height: 1.6;
+  }
+
+  /* ═══════════════ LOST SOUL / MEMORY BOX ═══════════════ */
+  .memory-box {
+    text-align: center; padding: 10px 0;
+  }
+  .memory-icon {
+    font-size: 60px; display: block;
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+
+  /* ═══════════════ DIVIDER ═══════════════ */
+  .divider {
+    display: flex; align-items: center; gap: 12px;
+    margin: 16px 0; color: var(--bark-light);
+  }
+  .divider::before, .divider::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--wood), transparent);
+  }
+
+  /* ═══════════════ WISP FLASH ═══════════════ */
+  @keyframes wisp-flash {
+    0% { background: transparent; }
+    20% { background: rgba(79,195,247,0.1); }
+    100% { background: transparent; }
+  }
+
+  /* ═══════════════ SKIP INFO ═══════════════ */
+  .skip-info {
+    font-size: 12px; color: var(--bark-light); margin-top: 8px;
+    text-align: center; font-style: italic;
+  }
+
+  /* ═══════════════ TEXTAREA ═══════════════ */
+  .rpg-textarea {
+    font-family: 'Crimson Text', serif; font-size: 16px;
+    color: var(--parchment);
+    background: rgba(0,0,0,0.4); border: 2px solid var(--wood);
+    border-radius: 8px; padding: 12px 16px;
+    width: 100%; min-height: 80px; resize: none; outline: none;
+    transition: border-color 0.2s;
+  }
+  .rpg-textarea:focus { border-color: var(--gold); box-shadow: 0 0 15px rgba(212,168,67,0.3); }
+
+  /* ═══════════════ NUMBER INPUT ═══════════════ */
+  .number-input-group {
+    display: flex; align-items: center; gap: 12px; margin-top: 6px;
+  }
+  .num-btn {
+    width: 40px; height: 40px; border-radius: 8px;
+    background: rgba(0,0,0,0.4); border: 2px solid var(--wood);
+    color: var(--gold); font-size: 20px;
+    cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .num-btn:hover { border-color: var(--gold); background: rgba(139,94,60,0.2); }
+  .num-display {
+    font-family: 'Cinzel', serif; font-size: 24px;
+    color: var(--gold); min-width: 40px; text-align: center;
+  }
+
+  /* Success flash */
+  .success-flash {
+    position: fixed; inset: 0; z-index: 999;
+    background: rgba(212,168,67,0.15);
+    pointer-events: none;
+    animation: success-fade 0.5s ease-out forwards;
+  }
+  @keyframes success-fade { from { opacity: 1; } to { opacity: 0; } }
+
+  /* Nav row */
+  .nav-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 14px;
+  }
+
+  .separator { color: var(--gold); margin: 0 8px; opacity: 0.4; }
+  .text-muted { color: var(--wood-light); font-size: 13px; }
+  .text-warning { color: var(--ember); }
+
+  /* AUTRE text reveal */
+  .autre-field {
+    margin-top: 8px;
+    animation: screen-in 0.3s ease-out;
+  }
+  .autre-field input {
+    font-family: 'Crimson Text', serif; font-size: 15px;
+    color: var(--parchment);
+    background: rgba(0,0,0,0.5); border: 1px solid var(--gold);
+    border-radius: 6px; padding: 8px 12px; width: 100%; outline: none;
+    transition: box-shadow 0.2s;
+  }
+  .autre-field input:focus { box-shadow: 0 0 10px rgba(212,168,67,0.3); }
+  .autre-field input::placeholder { color: rgba(196,149,106,0.45); }
+
+  /* CHARACTER CARD — sticker style */
+  .char-sticker-wrap {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 10px 0 20px;
+  }
+  .char-sticker {
+    position: relative; width: 180px; height: 200px;
+    margin: 0 auto 12px;
+  }
+  .char-sticker svg { width: 100%; height: 100%; }
+  .char-name-badge {
+    background: var(--gold);
+    color: var(--ink); font-family: 'Cinzel', serif;
+    font-size: 13px; font-weight: 700; letter-spacing: 1px;
+    padding: 5px 16px; border-radius: 20px;
+    box-shadow: 0 2px 10px rgba(212,168,67,0.5);
+    margin-bottom: 6px; text-align: center;
+    max-width: 240px; word-break: break-word;
+  }
+  .char-class-title {
+    font-family: 'Cinzel', serif; font-size: 24px; font-weight: 900;
+    color: var(--gold-bright); text-align: center;
+    text-shadow: 0 0 25px rgba(240,200,74,0.7);
+    margin: 4px 0;
+  }
+  .char-desc-text {
+    font-style: italic; color: var(--parchment-dark);
+    font-size: 15px; line-height: 1.65; text-align: center;
+    margin-top: 8px;
+  }
+  @keyframes sticker-in {
+    0% { transform: scale(0.3) rotate(-15deg); opacity: 0; }
+    60% { transform: scale(1.08) rotate(2deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  }
+  .char-sticker { animation: sticker-in 0.7s cubic-bezier(0.34,1.56,0.64,1) both; }
+
+  /* particles around sticker */
+  @keyframes sparkle {
+    0%,100% { opacity:0; transform: scale(0) translate(0,0); }
+    50% { opacity:1; transform: scale(1) translate(var(--tx),var(--ty)); }
+  }
+  .sparkle-ring span {
+    position:absolute; font-size:14px;
+    animation: sparkle 2s ease-in-out infinite;
+    animation-delay: var(--d);
+    left: 50%; top: 50%;
+    --tx: 0px; --ty: 0px;
+  }
+  /* MULTI-SELECT hint */
+  .multi-hint {
+    font-size: 11px; color: var(--moss-light); font-style: italic;
+    margin-bottom: 8px; display: flex; align-items: center; gap: 4px;
+  }
+</style>
+</head>
+<body>
+
+<!-- Forest Background -->
+<div class="forest-bg" id="forestBg">
+  <div class="stars" id="stars"></div>
+</div>
+
+<!-- Will-o-wisps -->
+<div class="wisp wisp-1" id="wisp1"></div>
+<div class="wisp wisp-2" id="wisp2"></div>
+
+<!-- Skip Counter -->
+<div id="skip-counter">⚡ Passages : <span id="skip-count">0</span>/5</div>
+
+<!-- App -->
+<div id="app"></div>
+
+<!-- Progress Bar -->
+<div id="progress-bar">
+  <div class="progress-scene">
+    <div class="prog-trees" id="prog-trees"></div>
+    <div class="ground-layer">
+      <div class="path-fill" id="path-fill"></div>
+    </div>
+    <div id="hero" class="idle"><div class="hero-body">🧙</div></div>
+    <div id="progress-label"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
+const state = {
+  slide: 'intro',
+  name: '',
+  pseudo: '',
+  gender: '', // 'homme', 'femme', 'specimen'
+  multipleParticipants: false,
+  participantCount: 1,
+  score: 0,
+  skipCount: 0,
+  lostSoul: false, // skipped >5 times
+  memoryBox: false, // unavailable / never
+  answers: {},
+  dialogueIndex: 0,
+  typed: '',
+  history: []
+};
+
+// ═══════════════════════════════════════════════
+//  SLIDES CONFIG
+// ═══════════════════════════════════════════════
+const SLIDES = [
+  'intro','intro2','blaze','multiple','dispo','motivation',
+  'lieux','logement','activites','bouffe','folie','fin'
+];
+
+const CHAPTERS = {
+  intro: { tag: 'Prologue', title: '✦ La Forêt Éveillée ✦' },
+  intro2: { tag: 'Prologue', title: '✦ Le Serment ✦' },
+  blaze: { tag: 'Chapitre I', title: '⚔️ Identité du Héros' },
+  multiple: { tag: 'Chapitre I', title: '⚔️ Le Groupe d\'Aventuriers' },
+  dispo: { tag: 'Chapitre II', title: '🗓 La Fenêtre Temporelle' },
+  motivation: { tag: 'Chapitre II', title: '🔥 La Flamme Intérieure' },
+  lieux: { tag: 'Chapitre III', title: '🗺 Terres Mystérieuses' },
+  logement: { tag: 'Chapitre IV', title: '🏰 Le Repaire du Guerrier' },
+  activites: { tag: 'Chapitre V', title: '🧗 Les Épreuves' },
+  bouffe: { tag: 'Chapitre VI', title: '🍖 Le Festin' },
+  folie: { tag: 'Chapitre VII', title: '✨ La Quête Ultime' },
+  fin: { tag: 'Épilogue', title: '🏆 Destinée Révélée' }
+};
+
+const PROGRESS_STEPS = ['intro','blaze','dispo','lieux','logement','activites','bouffe','folie','fin'];
+
+// ═══════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════
+function genderPronoun(type='il') {
+  if(state.gender === 'femme') return type === 'il' ? 'elle' : type === 'son' ? 'sa' : type;
+  if(state.gender === 'specimen') return type === 'il' ? 'iel' : type === 'son' ? 'son' : type;
+  return type;
+}
+
+function genderAdj(masc, fem='e') {
+  if(state.gender === 'femme') return masc + fem;
+  if(state.gender === 'specimen') return masc + '·' + fem;
+  return masc;
+}
+
+function heroEmoji() {
+  if(state.gender === 'femme') return '🧙‍♀️';
+  if(state.gender === 'specimen') return '🧝';
+  return '🧙';
+}
+
+function pseudoDisplay() { return state.pseudo || state.name || 'Aventurier·ère'; }
+
+// ═══════════════════════════════════════════════
+//  TYPEWRITER
+// ═══════════════════════════════════════════════
+let typeTimer = null;
+function typeText(el, text, speed=28, cb) {
+  if(typeTimer) clearInterval(typeTimer);
+  el.innerHTML = '';
+  let i = 0;
+  typeTimer = setInterval(() => {
+    el.innerHTML = text.slice(0,i) + '<span class="cursor"></span>';
+    i++;
+    if(i > text.length) {
+      clearInterval(typeTimer); typeTimer = null;
+      el.innerHTML = text;
+      if(cb) cb();
+    }
+  }, speed);
+}
+
+// ═══════════════════════════════════════════════
+//  PROGRESS BAR
+// ═══════════════════════════════════════════════
+function updateProgress() {
+  const idx = PROGRESS_STEPS.indexOf(state.slide);
+  const total = PROGRESS_STEPS.length - 1;
+  const pct = Math.max(0, Math.min(100, (idx / total) * 100));
+
+  // Path fill
+  document.getElementById('path-fill').style.width = pct + '%';
+
+  // Hero position
+  const hero = document.getElementById('hero');
+  hero.style.left = `calc(${pct}% - 10px)`;
+  hero.querySelector('.hero-body').textContent = state.memoryBox ? '👻' : heroEmoji();
+
+  // Trees — SVG-based, varied sizes
+  const treesEl = document.getElementById('prog-trees');
+  treesEl.innerHTML = '';
+  const treeData = [
+    {h:55,w:28},{h:68,w:34},{h:48,w:25},{h:72,w:36},{h:58,w:30},
+    {h:62,w:32},{h:45,w:23}
+  ];
+  PROGRESS_STEPS.slice(1,-1).forEach((step, i) => {
+    const frac = (i+1) / (PROGRESS_STEPS.length-1);
+    const isPassed = idx > i+1;
+    const isCheck = step === state.slide;
+    const td = treeData[i % treeData.length];
+    const tw = td.w, th = td.h;
+    const trunkW = Math.round(tw*0.18), trunkH = Math.round(th*0.28);
+    const crown = isCheck ? '#D4A843' : isPassed ? '#7A9A5A' : '#3D5C30';
+    const crownStroke = isCheck ? '#F0C84A' : isPassed ? '#9ABF6A' : '#2A4020';
+    const trunkC = '#4A2C1A';
+    const div = document.createElement('div');
+    div.className = 'prog-tree-svg' + (isPassed ? ' passed' : '') + (isCheck ? ' checkpoint' : '');
+    div.style.left = (frac * 100) + '%';
+    div.innerHTML = `<svg width="${tw}" height="${th}" viewBox="0 0 ${tw} ${th}" xmlns="http://www.w3.org/2000/svg">
+      <!-- trunk -->
+      <rect x="${(tw-trunkW)/2}" y="${th-trunkH}" width="${trunkW}" height="${trunkH}" rx="2" fill="${trunkC}"/>
+      <!-- lower canopy -->
+      <polygon points="${tw/2},${th*0.28} ${tw*0.05},${th*0.78} ${tw*0.95},${th*0.78}" fill="${crown}" stroke="${crownStroke}" stroke-width="1"/>
+      <!-- mid canopy -->
+      <polygon points="${tw/2},${th*0.1} ${tw*0.12},${th*0.55} ${tw*0.88},${th*0.55}" fill="${crown}" stroke="${crownStroke}" stroke-width="1"/>
+      <!-- top canopy -->
+      <polygon points="${tw/2},0 ${tw*0.22},${th*0.35} ${tw*0.78},${th*0.35}" fill="${isCheck?'#F0C84A':isPassed?'#8DC06A':crown}" stroke="${crownStroke}" stroke-width="1"/>
+      ${isCheck ? `<circle cx="${tw/2}" cy="${th*0.04}" r="3" fill="#FFD700" opacity="0.9"/>` : ''}
+    </svg>`;
+    treesEl.appendChild(div);
+  });
+
+  // Label
+  const ch = CHAPTERS[state.slide];
+  document.getElementById('progress-label').textContent = ch ? ch.tag : '';
+  document.getElementById('skip-counter').style.display = state.slide !== 'intro' && state.slide !== 'intro2' ? 'block' : 'none';
+  document.getElementById('skip-count').textContent = state.skipCount;
+}
+
+// ═══════════════════════════════════════════════
+//  RENDER ENGINE
+// ═══════════════════════════════════════════════
+const app = document.getElementById('app');
+
+function navigate(slide) {
+  state.history.push(state.slide);
+  state.slide = slide;
+  render();
+  updateProgress();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goBack() {
+  if(state.history.length === 0) return;
+  state.slide = state.history.pop();
+  render();
+  updateProgress();
+}
+
+function skipQuestion() {
+  state.skipCount++;
+  const nextSlide = getNextSlide();
+  if(nextSlide) navigate(nextSlide);
+}
+
+function getNextSlide() {
+  const idx = SLIDES.indexOf(state.slide);
+  return SLIDES[idx + 1] || 'fin';
+}
+
+function addScore(pts) { state.score += pts; }
+
+function flashSuccess() {
+  const el = document.createElement('div');
+  el.className = 'success-flash';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 500);
+}
+
+// ═══════════════════════════════════════════════
+//  DIALOGUE BOX builder
+// ═══════════════════════════════════════════════
+function dialogueBox(content) {
+  return `<div class="dialogue-box">
+    <div class="wood-grain"></div>
+    <span class="corner corner-tl">🌿</span>
+    <span class="corner corner-tr">🌿</span>
+    <span class="corner corner-bl">🌿</span>
+    <span class="corner corner-br">🌿</span>
+    ${content}
+  </div>`;
+}
+
+function chapterHeader(slide) {
+  const ch = CHAPTERS[slide] || {};
+  return `<div class="chapter-header">
+    <div class="chapter-tag">${ch.tag || ''}</div>
+    <div class="chapter-title">${ch.title || ''}</div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════
+//  SLIDES
+// ═══════════════════════════════════════════════
+function render() {
+  app.innerHTML = '';
+  const screen = document.createElement('div');
+  screen.className = 'screen';
+
+  switch(state.slide) {
+
+    // ─── INTRO ───────────────────────────────────
+    case 'intro':
+      screen.innerHTML = `
+        ${chapterHeader('intro')}
+        ${dialogueBox(`
+          <div class="title-main">✦ 5 ANS ✦</div>
+          <div class="title-sub">Une Quête Légendaire</div>
+          <div class="narrator-text" id="narr">
+            Bienvenue, ami de longue date.<br><br>
+            Si tu n'as <em>pas été invité·e</em>, ferme gentiment cette page et passe une bonne journée. 🙏<br><br>
+            Les autres... approchez. <strong>La forêt vous attend.</strong>
+          </div>
+          <button class="btn-primary" onclick="navigate('intro2')">▶ Entrer dans la Forêt</button>
+        `)}
+      `;
+      break;
+
+    // ─── INTRO 2 ─────────────────────────────────
+    case 'intro2':
+      screen.innerHTML = `
+        ${chapterHeader('intro2')}
+        ${dialogueBox(`
+          <div class="narrator-text">
+            Il y a 5 ans, sous les étoiles et l'odeur du chêne, <em>deux flammes se sont unies</em>.<br><br>
+            Pour célébrer ce bois qui les lie, ils vous convient à une <strong>quête remplie de fun, d'aventures et de rebondissements</strong>.<br><br>
+            ✦ ✦ ✦<br><br>
+            Ce questionnaire est votre carte. Il guidera vos pas et révélera <em>votre destinée</em> dans cette grande aventure.<br><br>
+            <span class="text-muted">(Il ne sert qu'à récolter de précieuses informations pour préparer la fête. Promis.)</span>
+          </div>
+          <div class="nav-row">
+            <button class="btn-nav" onclick="goBack()">◂ Retour</button>
+            <button class="btn-primary" style="margin-top:0;flex:1;margin-left:10px;" onclick="navigate('blaze')">La Quête Commence ⚔️</button>
+          </div>
+        `)}
+      `;
+      break;
+
+    // ─── BLAZE ───────────────────────────────────
+    case 'blaze':
+      screen.innerHTML = `
+        ${chapterHeader('blaze')}
+        ${dialogueBox(`
+          <div class="narrator-text" style="margin-bottom:4px;">
+            Avant toute chose, le Grimoire doit connaître ton identité…
+          </div>
+
+          <label class="input-label">📜 Nom Véritable <span class="text-muted">(en cas de péril)</span></label>
+          <input class="rpg-input" type="text" id="inp-name" placeholder="Jean Dupont…" value="${state.name}">
+
+          <label class="input-label">⚡ Pseudo Légendaire</label>
+          <input class="rpg-input" type="text" id="inp-pseudo" placeholder="BerserkerDesFêtes…" value="${state.pseudo}">
+
+          <label class="input-label">🌀 Genre de l'Aventurier·ère</label>
+          <div class="gender-group">
+            <button class="gender-btn ${state.gender==='homme'?'selected':''}" onclick="setGender('homme')">
+              <span class="emoji">🧙‍♂️</span>Un bonhomme
+            </button>
+            <button class="gender-btn ${state.gender==='femme'?'selected':''}" onclick="setGender('femme')">
+              <span class="emoji">🧙‍♀️</span>Une meuf
+            </button>
+            <button class="gender-btn ${state.gender==='specimen'?'selected':''}" onclick="setGender('specimen')">
+              <span class="emoji">🧝</span>Un spécimen rare
+            </button>
+          </div>
+
+          <button class="btn-primary" onclick="submitBlaze()">Forger mon Identité 🔥</button>
+          <div class="nav-row">
+            <button class="btn-nav" onclick="goBack()">◂ Retour</button>
+          </div>
+        `)}
+      `;
+      break;
+
+    // ─── MULTIPLE ────────────────────────────────
+    case 'multiple':
+      screen.innerHTML = `
+        ${chapterHeader('multiple')}
+        ${dialogueBox(`
+          <div class="narrator-text">
+            Noble <em>${pseudoDisplay()}</em>, réponds-tu pour <strong>plusieurs aventuriers</strong> à la fois ?<br><br>
+            <span class="text-muted">(On te conseille fortement de répondre individuellement — chaque héros mérite sa propre quête !)</span>
+          </div>
+
+          <div class="btn-group" style="margin-top:16px;">
+            <button class="btn-choice ${state.multipleParticipants===false?'selected':''}" onclick="setMultiple(false)">Non, je suis seul·e dans l'aventure</button>
+            <button class="btn-choice ${state.multipleParticipants===true?'selected':''}" onclick="setMultiple(true)">Oui, on est plusieurs autour du parchemin</button>
+          </div>
+
+          ${state.multipleParticipants ? `
+          <div style="margin-top:16px;">
+            <label class="input-label">Combien de vaillants participants ?</label>
+            <div class="number-input-group">
+              <button class="num-btn" onclick="changeCount(-1)">−</button>
+              <div class="num-display" id="count-display">${state.participantCount}</div>
+              <button class="num-btn" onclick="changeCount(1)">+</button>
+            </div>
+          </div>` : ''}
+
+          <div class="nav-row" style="margin-top:16px;">
+            <button class="btn-nav" onclick="goBack()">◂ Retour</button>
+            <button class="btn-primary" style="margin-top:0;flex:1;margin-left:10px;" onclick="navigate('dispo')">Continuer →</button>
+          </div>
+        `)}
+      `;
+      break;
+
+    // ─── DISPO ───────────────────────────────────
+    case 'dispo':
+      screen.innerHTML = `
+        ${chapterHeader('dispo')}
+        ${dialogueBox(`
+          <div class="narrator-text">
+            La quête se déroule <strong>fin août 2026</strong>. Les feux follets n'attendent pas.<br><br>
+            Es-tu disponible à cette période ?
+          </div>
+
+          <div class="btn-group" style="margin-top:16px;">
+            <button class="btn-choice" onclick="setDispo(true)">✅ Oui, je suis libre comme le vent !</button>
+            <button class="btn-choice" onclick="setDispo(false)">❌ Non, la vie est cruelle…</button>
+          </div>
+
+          <div class="nav-row" style="margin-top:16px;">
+            <button class="btn-nav" onclick="goBack()">◂ Retour</button>
+            <button class="btn-nav" onclick="skipQuestion()">Passer ↷</button>
+          </div>
+          <div class="skip-info">Passer consomme un passage (${5-state.skipCount} restants)</div>
+        `)}
+      `;
+      break;
+
+    // ─── MOTIVATION ──────────────────────────────
+    case 'motivation':
+      screen.innerHTML = `
+        ${chapterHeader('motivation')}
+        ${dialogueBox(`
+          <div class="narrator-text">
+            L'ardeur du guerrier détermine la durée du combat.<br>Jusqu'où es-tu prêt·e à te battre ?
+          </div>
+
+          <div class="btn-group" style="margin-top:16px;">
+            <button class="btn-choice" onclick="chooseMotivation('17au23',3)">⚔️ Du 17 au 23 août 2026 — le grand arc narratif !</button>
+            <button class="btn-choice" onclick="chooseMotivation('21au23',1)">🗡️ Du 21 au 23 août — un sprint héroïque</button>
+            <button class="btn-choice" onclick="chooseMotivation('24h',2)">🕯️ Uniquement 24h — apparition mythique</button>
+            <button class="btn-choice" onclick="chooseMotivation('toute-la-vie',3)">♾️ Toute la vie — un compagnon de route éternel</button>
+            <button class="btn-choice text-warning" onclick="setMemoryBoxNever()">💀 Never — la boîte à souvenirs m'appelle</button>
+          </div>
+
+          <div class="nav-row" style="margin-top:14px;">
+            <button class="btn-nav" onclick="goBack()">◂ Retour</button>
+            <button class="btn-nav" onclick="skipQuestion()">Passer ↷</button>
+          </div>
+        `)}
+      `;
+      break;
+
+    // ─── LIEUX ───────────────────────────────────
+    case 'lieux':
+      screen.innerHTML = `
+        ${chapterHeader('lieux')}
+        ${dialogueBox(`
+          <div class="narrator-text">
+            Vers quelles terres sauvages ton cœur te guide-t-il ?
+          </div>
+          <div class="multi-hint">🗺 Plusieurs choix possibles</div>
+
+          <div class="btn-group">
+            ${multiChoice('lieux', [
+              ['Ardèche 🌊 — eaux vives et gorges profondes', 'ardeche', 3],
+              ['Vercors 🏔️ — plateaux et mystères karstiques', 'vercors', 3],
+              ['Buoux / Verdon 🧗 — les cathédrales de roche', 'buoux', 3],
+              ['À moins de 100km de chez moi 🏠 — flemmard assumé·e', 'pres', 1],
+              ['Antrebloc 🪨 — le bloc, toujours le bloc', 'antrebloc', 2],
+              ['Dans votre salon 🛋️ — confort maximal', 'salon', 2],
+              ['Ibiza 🏝️ — la fête jusqu\'au bout', 'ibiza', 2],
+              ['Autre destination ✨', 'autre', 0],
+            ])}
+          </div>
+
+          <div class="nav-row" style="margin-top:14px;">
+            <button class="btn-nav" onclick="goBack()">◂ Retour</button>
+            <button class="btn-primary" style="margin-top:0;flex:1;margin-left:10px;" onclick="nextFromMulti('lieux','logement')">Continuer →</button>
+          </div>
+          <div class="skip-info">ou <span style="cursor:pointer;color:var(--wood-light);" onclick="skipQuestion()">passer cette étape ↷</span></div>
+        `)}
+      `;
+      break;
+
+    // ─── LOGEMENT ────────────────────────────────
+    case 'logement':
+      screen.innerHTML = `
+        ${chapterHeader('logement')}
+        ${dialogueBox(`
+          <div class="narrator-text">
+            Tout héros a besoin d'un repaire. Quel est le tien ?
+          </div>
+          <div class="multi-hint">🏰 Plusieurs choix possibles</div>
+
+          <div class="btn-group">
+            ${multiChoice('logement', [
+              ['Gîte 🌾 — convivial et authentique', 'gite', 3],
+              ['Demi-pension 🍽️ — le juste équilibre', 'demi', 3],
+              ['Pension complète 🥘 — tout inclus, je veux rien faire', 'pension', 2],
+              ['Avec piscine 🏊 — indispensable à ma survie', 'piscine', 3],
+              ['En pleine nature 🌳 — tente et étoiles', 'nature', 3],
+              ['Spa et masseuses 💆 — la vie de château', 'spa', 2],
+              ['Autre configuration 🔮', 'autre', 1],
+            ])}
+          </div>
+
+          <div class="nav-row" style="margin-top:14px;">
+            <button class="btn-nav" onclick="goBack()">◂ Retour</button>
+            <button class="btn-primary" style="margin-top:0;flex:1;margin-left:10px;" onclick="nextFromMulti('logement','activites')">Continuer →</button>
+          </div>
+          <div class="skip-info">ou <span style="cursor:pointer;color:var(--wood-light);" onclick="skipQuestion()">passer ↷</span></div>
+        `)}
+      `;
+      break;
+
+    // ─── ACTIVITES ───────────────────────────────
+    case 'activites':
+      screen.innerHTML = `
+        ${chapterHeader('activites')}
+        ${dialogueBox(`
+          <div class="narrator-text">
+            Quelles épreuves es-tu prêt·e à relever ?
+          </div>
+          <div class="multi-hint">⚔️ Choisis autant que tu veux</div>
+
+          <div class="btn-group">
+            ${multiChoice('activites', [
+              ['Via ferrata 🪝 — accroche-toi !', 'ferrata', 3],
+              ['Randonnée 🥾 — marcher jusqu\'au bout du monde', 'rando', 3],
+              ['Canyoning 💦 — sauter dans le vide', 'canyon', 3],
+              ['Canoë 🛶 — pagaie et courant', 'canoe', 3],
+              ['Spéléo 🦇 — l\'underground extrême', 'speleo', 3],
+              ['Escalade 🧗 — vertical forever', 'escalade', 3],
+              ['Que du bloc 🪨 — PB ou rien', 'bloc', 3],
+              ['Piscine, piscine, piscine 🏊‍♀️', 'piscine', 2],
+              ['Hamac 🌴 — le héros qui se repose', 'hamac', 2],
+              ['Just chill 🍃 — et c\'est très bien comme ça', 'chill', 1],
+              ['Visites & culture 🏛️ — nourrir l\'esprit', 'visite', 1],
+              ['Autre activité secrète 🎲', 'autre', 0],
+            ])}
+          </div>
+
+          <div class="nav-row" style="margin-top:14px;">
+            <button class="btn-nav" onclick="goBack()">◂ Retour</button>
+            <button class="btn-primary" style="margin-top:0;flex:1;margin-left:10px;" onclick="nextFromMulti('activites','bouffe')">Continuer →</button>
+          </div>
+          <div class="skip-info">ou <span style="cursor:pointer;color:var(--wood-light);" onclick="skipQuestion()">passer ↷</span></div>
+        `)}
+      `;
+      break;
+
+    // ─── BOUFFE ──────────────────────────────────
+    case 'bouffe':
+      screen.innerHTML = `
+        ${chapterHeader('bouffe')}
+        ${dialogueBox(`
+          <div class="narrator-text">
+            Tout guerrier combat mieux le ventre plein. Comment envisages-tu le festin ?
+          </div>
+          <div class="multi-hint">🍖 Choix multiples bienvenus</div>
+
+          <div class="btn-group">
+            ${multiChoice('bouffe', [
+              ['Du houblon 🍺 — la bière, c\'est une alimentation complète', 'houblon', 2],
+              ['À la bonne franquette 🥘 — fait maison, fait avec amour', 'franquette', 3],
+              ['Au restaurant 🍽️ — quelqu\'un d\'autre fait la vaisselle', 'resto', 1],
+              ['Demi-pension 🛎️ — je me prends pas le chou', 'pension', 3],
+              ['BBQ BBQ BBQ 🔥 — le feu sacré de la viande', 'bbq', 2],
+            ])}
+          </div>
+
+          <div class="nav-row" style="margin-top:14px;">
+            <button class="btn-nav" onclick="goBack()">◂ Retour</button>
+            <button class="btn-primary" style="margin-top:0;flex:1;margin-left:10px;" onclick="nextFromMulti('bouffe','folie')">Continuer →</button>
+          </div>
+          <div class="skip-info">ou <span style="cursor:pointer;color:var(--wood-light);" onclick="skipQuestion()">passer ↷</span></div>
+        `)}
+      `;
+      break;
+
+    // ─── FOLIE ───────────────────────────────────
+    case 'folie':
+      screen.innerHTML = `
+        ${chapterHeader('folie')}
+        ${dialogueBox(`
+          <div class="narrator-text">
+            Et maintenant… <strong>la question ultime</strong>.<br><br>
+            Si tu pouvais inventer une activité légendaire — un truc dingue, improbable, inoubliable — quelle serait ta <em>quête personnelle</em> pour ces 5 ans ?<br><br>
+            <span class="text-muted">🗺 Exemples : une rando aux flambeaux à minuit, un sous-marin à louer pour l'apéro, une chasse au trésor avec 12 étapes, un dîner 1001 saveurs dans une grotte…</span>
+          </div>
+
+          <textarea class="rpg-textarea" id="inp-folie" placeholder="Ma quête ultime serait…" style="margin-top:12px;">${state.answers.folie || ''}</textarea>
+
+          <div class="nav-row" style="margin-top:14px;">
+            <button class="btn-nav" onclick="goBack()">◂ Retour</button>
+            <button class="btn-primary" style="margin-top:0;flex:1;margin-left:10px;" onclick="submitFolie()">Sceller ma Destinée 🔮</button>
+          </div>
+        `)}
+      `;
+      break;
+
+    // ─── FIN ─────────────────────────────────────
+    case 'fin': {
+      const result = computeResult();
+      const stickerSVG = buildCharacterSVG(result.charType, state.gender);
+      screen.innerHTML = `
+        ${chapterHeader('fin')}
+        ${dialogueBox(`
+          <div class="char-sticker-wrap">
+            <div class="narrator-text" style="text-align:center;margin-bottom:14px;font-size:14px;color:var(--wood-light);">
+              Après mille épreuves… le Grimoire révèle ta vraie nature.
+            </div>
+            <div class="char-sticker">
+              ${stickerSVG}
+            </div>
+            <div class="char-name-badge">⚔ ${pseudoDisplay()} ⚔</div>
+            <div class="char-class-title">${result.title}</div>
+            <div style="height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:10px 0;width:80%;"></div>
+            <div class="char-desc-text">${result.desc}</div>
+
+            ${state.skipCount > 5 ? `<div style="margin-top:12px;padding:10px;border:1px solid var(--ember);border-radius:8px;color:var(--ember);font-size:13px;text-align:center;">
+              ⚠️ <em>Le Grimoire note une âme qui a fui ses épreuves…</em>
+            </div>` : ''}
+
+            <button class="btn-primary" style="margin-top:20px;max-width:320px;" onclick="submitResults()">📜 Sceller mon Destin</button>
+          </div>
+        `)}
+      `;
+      break;
+    }
+
+    // ─── MEMORY BOX ──────────────────────────────
+    case 'memory_box':
+      screen.innerHTML = `
+        <div class="chapter-header">
+          <div class="chapter-tag">Boîte à Souvenirs</div>
+          <div class="chapter-title">📦 La Forêt te garde une place</div>
+        </div>
+        ${dialogueBox(`
+          <div style="text-align:center;">
+            <div style="font-size:64px;display:block;animation:float 3s ease-in-out infinite;margin-bottom:8px;">📦</div>
+            <div class="title-main" style="font-size:20px;">Pas cette fois…</div>
+          </div>
+          <div style="height:1px;background:linear-gradient(90deg,transparent,var(--wood),transparent);margin:14px 0;"></div>
+          <div class="narrator-text" style="text-align:center;">
+            La forêt ne s'ouvre pas à toi <em>cet été</em>.<br>
+            Mais elle t'attend, toi et tes histoires.<br><br>
+            <strong>Rendez-vous début septembre</strong> — on te raconte tout autour d'un feu. 🍂🔥<br><br>
+            <span style="font-size:14px;color:var(--wood-light);">En attendant, laisse un mot pour les mariés…</span>
+          </div>
+
+          <label class="input-label" style="margin-top:16px;">💬 Ton message</label>
+          <textarea class="rpg-textarea" id="inp-memory-msg" placeholder="Je serai là en pensée… ou Je vous prépare une surprise pour septembre… ou juste ❤️" style="min-height:90px;">${state.answers.memoryMsg || ''}</textarea>
+
+          <button class="btn-primary" style="margin-top:16px;" onclick="submitMemoryBox()">📮 Déposer dans la Boîte</button>
+        `)}
+      `;
+      break;
+
+    // ─── RESULT SUBMITTED ────────────────────────
+    case 'submitted':
+      screen.innerHTML = `
+        ${dialogueBox(`
+          <div style="text-align:center;padding:20px 0;">
+            <div style="font-size:60px;animation:float 3s ease-in-out infinite;">🌟</div>
+            <div class="title-main" style="margin-top:12px;">Grimoire Scellé !</div>
+            <div style="margin:12px 0;" class="narrator-text">
+              Tes réponses ont été transmises aux gardiens de la quête.<br><br>
+              Prépare ton sac, ${pseudoDisplay()}. <em>L'aventure approche.</em> 🔥
+            </div>
+          </div>
+        `)}
+      `;
+      break;
+  }
+
+  app.appendChild(screen);
+}
+
+// ═══════════════════════════════════════════════
+//  MULTI-CHOICE HELPER
+// ═══════════════════════════════════════════════
+function multiChoice(key, options) {
+  if(!state.answers[key]) state.answers[key] = {};
+  return options.map(([label, val, pts]) => {
+    const sel = state.answers[key][val] ? 'selected' : '';
+    const isAutre = val === 'autre';
+    const autreTxt = state.answers[key]['_autre_text'] || '';
+    const showField = isAutre && state.answers[key][val] ? '' : 'display:none';
+    if(isAutre) {
+      return `<button class="btn-choice ${sel}" id="btn-autre-${key}" onclick="toggleAutre('${key}',this)">${label}</button>
+      <div class="autre-field" id="autre-field-${key}" style="${showField}">
+        <input type="text" placeholder="Dis-nous tout… ✍️" value="${autreTxt}" oninput="setAutreText('${key}',this.value)">
+      </div>`;
+    }
+    return `<button class="btn-choice ${sel}" onclick="toggleMulti('${key}','${val}',${pts},this)">${label}</button>`;
+  }).join('');
+}
+
+function toggleAutre(key, btn) {
+  if(!state.answers[key]) state.answers[key] = {};
+  const field = document.getElementById(`autre-field-${key}`);
+  if(state.answers[key]['autre']) {
+    delete state.answers[key]['autre'];
+    btn.classList.remove('selected');
+    field.style.display = 'none';
+  } else {
+    state.answers[key]['autre'] = true;
+    btn.classList.add('selected');
+    field.style.display = 'block';
+    field.querySelector('input').focus();
+  }
+}
+
+function setAutreText(key, val) {
+  if(!state.answers[key]) state.answers[key] = {};
+  state.answers[key]['_autre_text'] = val;
+}
+
+function toggleMulti(key, val, pts, btn) {
+  if(!state.answers[key]) state.answers[key] = {};
+  if(state.answers[key][val]) {
+    delete state.answers[key][val];
+    btn.classList.remove('selected');
+    state.score -= pts;
+  } else {
+    state.answers[key][val] = pts;
+    btn.classList.add('selected');
+    state.score += pts;
+  }
+}
+
+function nextFromMulti(key, next) {
+  navigate(next);
+}
+
+// ═══════════════════════════════════════════════
+//  ACTIONS
+// ═══════════════════════════════════════════════
+function setGender(g) {
+  state.gender = g;
+  document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('selected'));
+  event.target.closest('.gender-btn').classList.add('selected');
+}
+
+function submitBlaze() {
+  const name = document.getElementById('inp-name').value.trim();
+  const pseudo = document.getElementById('inp-pseudo').value.trim();
+  if(!name) { alert('Quel est ton nom, aventurier·ère ? 📜'); return; }
+  if(!state.gender) { alert('Choisis ton genre pour que le Grimoire t\'identifie ! 🌀'); return; }
+  state.name = name;
+  state.pseudo = pseudo || name;
+  navigate('multiple');
+}
+
+function setMultiple(val) {
+  state.multipleParticipants = val;
+  render();
+}
+
+function changeCount(d) {
+  state.participantCount = Math.max(2, state.participantCount + d);
+  document.getElementById('count-display').textContent = state.participantCount;
+}
+
+function setDispo(val) {
+  state.answers.dispo = val;
+  if(!val) {
+    state.memoryBox = true;
+    navigate('memory_box');
+  } else {
+    navigate('motivation');
+  }
+}
+
+function chooseMotivation(val, pts) {
+  state.answers.motivation = val;
+  addScore(pts);
+  flashSuccess();
+  navigate('lieux');
+}
+
+function setMemoryBoxNever() {
+  state.answers.motivation = 'never';
+  state.memoryBox = true;
+  navigate('memory_box');
+}
+
+function submitFolie() {
+  const txt = document.getElementById('inp-folie').value.trim();
+  state.answers.folie = txt;
+  navigate('fin');
+}
+
+function skipQuestion() {
+  state.skipCount++;
+  document.getElementById('skip-count').textContent = state.skipCount;
+  const nextSlide = getNextSlide();
+  if(nextSlide) navigate(nextSlide);
+}
+
+function submitMemoryBox() {
+  const msg = document.getElementById('inp-memory-msg');
+  state.answers.memoryMsg = msg ? msg.value.trim() : '';
+  submitResults();
+}
+
+// ═══════════════════════════════════════════════
+//  CHARACTER SVG STICKER BUILDER
+// ═══════════════════════════════════════════════
+function buildCharacterSVG(charType, gender) {
+  // Each character is a unique illustrated sticker
+  const isFemme = gender === 'femme';
+  const isSpec = gender === 'specimen';
+
+  const chars = {
+    chevalier: (f) => `
+      <svg viewBox="0 0 180 200" xmlns="http://www.w3.org/2000/svg">
+        <!-- glow halo -->
+        <ellipse cx="90" cy="100" rx="75" ry="80" fill="rgba(212,168,67,0.07)"/>
+        <!-- cape -->
+        <path d="M55,110 Q40,160 50,185 Q90,175 130,185 Q140,160 125,110 Z" fill="#8B0000" stroke="#600000" stroke-width="1.5"/>
+        <!-- body armor -->
+        <rect x="62" y="95" width="56" height="55" rx="6" fill="#888" stroke="#aaa" stroke-width="1.5"/>
+        <rect x="68" y="100" width="44" height="10" rx="3" fill="#aaa" stroke="#ccc" stroke-width="1"/>
+        <!-- chest emblem -->
+        <polygon points="90,108 94,116 88,116" fill="${f?'#FF69B4':'#D4A843'}"/>
+        <!-- arms -->
+        <rect x="42" y="95" width="20" height="40" rx="8" fill="#777" stroke="#999" stroke-width="1.5"/>
+        <rect x="118" y="95" width="20" height="40" rx="8" fill="#777" stroke="#999" stroke-width="1.5"/>
+        <!-- gauntlets -->
+        <rect x="42" y="128" width="20" height="16" rx="4" fill="#555" stroke="#888" stroke-width="1"/>
+        <rect x="118" y="128" width="20" height="16" rx="4" fill="#555" stroke="#888" stroke-width="1"/>
+        <!-- sword -->
+        <rect x="138" y="60" width="6" height="70" rx="2" fill="#ccc" stroke="#999" stroke-width="1"/>
+        <rect x="130" y="78" width="22" height="5" rx="2" fill="#D4A843"/>
+        <circle cx="141" cy="74" r="5" fill="#D4A843"/>
+        <!-- neck -->
+        <rect x="80" y="72" width="20" height="25" rx="8" fill="${f?'#FDBCB4':'#FCCBA1'}"/>
+        <!-- head / helmet -->
+        <ellipse cx="90" cy="58" rx="26" ry="24" fill="#777" stroke="#999" stroke-width="2"/>
+        <!-- visor -->
+        <rect x="70" y="55" width="40" height="12" rx="4" fill="#333" stroke="#555" stroke-width="1"/>
+        <line x1="90" y1="55" x2="90" y2="67" stroke="#555" stroke-width="1.5"/>
+        <!-- plume -->
+        ${f ? '<path d="M90,34 Q75,20 65,10 Q80,25 82,35" fill="#FF69B4" stroke="#FF1493" stroke-width="1"/><path d="M90,34 Q105,20 115,8 Q100,25 98,35" fill="#FFB6C1" stroke="#FF69B4" stroke-width="1"/>' :
+              '<path d="M90,34 Q75,20 65,10 Q80,25 82,35" fill="#D4A843" stroke="#B8860B" stroke-width="1"/><path d="M90,34 Q105,20 115,8 Q100,25 98,35" fill="#F0C84A" stroke="#D4A843" stroke-width="1"/>'}
+        <!-- legs -->
+        <rect x="68" y="148" width="20" height="38" rx="5" fill="#666" stroke="#888" stroke-width="1.5"/>
+        <rect x="92" y="148" width="20" height="38" rx="5" fill="#666" stroke="#888" stroke-width="1.5"/>
+        <!-- boots -->
+        <rect x="64" y="180" width="28" height="16" rx="5" fill="#3a2a1a" stroke="#555" stroke-width="1"/>
+        <rect x="88" y="180" width="28" height="16" rx="5" fill="#3a2a1a" stroke="#555" stroke-width="1"/>
+        <!-- gold stars -->
+        <text x="20" y="40" font-size="12">⭐</text>
+        <text x="148" y="40" font-size="12">⭐</text>
+      </svg>`,
+
+    mage: (f) => `
+      <svg viewBox="0 0 180 200" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="90" cy="100" rx="75" ry="80" fill="rgba(79,195,247,0.07)"/>
+        <!-- robe -->
+        <path d="M50,100 Q40,180 55,200 L125,200 Q140,180 130,100 Z" fill="#2a1a6e" stroke="#4a2a9e" stroke-width="1.5"/>
+        <!-- robe detail -->
+        <path d="M90,100 L78,200 M90,100 L102,200" stroke="#4a2a9e" stroke-width="1" opacity="0.6"/>
+        <path d="M55,140 Q90,150 125,140" stroke="#6a4abe" stroke-width="1.5" fill="none"/>
+        <!-- star pattern on robe -->
+        <text x="68" y="140" font-size="10" fill="#D4A843">✦</text>
+        <text x="96" y="155" font-size="8" fill="#D4A843">✦</text>
+        <text x="75" y="168" font-size="9" fill="#4FC3F7">★</text>
+        <!-- sleeves -->
+        <path d="M50,100 Q28,115 22,145 Q38,140 50,135 Z" fill="#2a1a6e" stroke="#4a2a9e" stroke-width="1.5"/>
+        <path d="M130,100 Q152,115 158,145 Q142,140 130,135 Z" fill="#2a1a6e" stroke="#4a2a9e" stroke-width="1.5"/>
+        <!-- hands -->
+        <circle cx="24" cy="148" r="9" fill="${f?'#FDBCB4':'#FCCBA1'}"/>
+        <circle cx="156" cy="148" r="9" fill="${f?'#FDBCB4':'#FCCBA1'}"/>
+        <!-- staff -->
+        <rect x="155" y="40" width="5" height="110" rx="2" fill="#4A2C1A"/>
+        <ellipse cx="157" cy="36" rx="12" ry="12" fill="none" stroke="#4FC3F7" stroke-width="2"/>
+        <circle cx="157" cy="36" r="7" fill="#26C6DA" opacity="0.8"/>
+        <circle cx="157" cy="36" r="3" fill="white"/>
+        <!-- magic glow -->
+        <circle cx="157" cy="36" r="18" fill="rgba(79,195,247,0.15)" stroke="rgba(79,195,247,0.3)" stroke-width="1"/>
+        <!-- neck -->
+        <rect x="80" y="72" width="20" height="28" rx="8" fill="${f?'#FDBCB4':'#FCCBA1'}"/>
+        <!-- head -->
+        <ellipse cx="90" cy="56" rx="24" ry="26" fill="${f?'#FDBCB4':'#FCCBA1'}" stroke="${f?'#e0a090':'#DBA87A'}" stroke-width="1.5"/>
+        <!-- eyes -->
+        <ellipse cx="82" cy="54" rx="4" ry="5" fill="white"/>
+        <ellipse cx="98" cy="54" rx="4" ry="5" fill="white"/>
+        <circle cx="83" cy="55" r="2.5" fill="#1a0a4a"/>
+        <circle cx="99" cy="55" r="2.5" fill="#1a0a4a"/>
+        <circle cx="84" cy="54" r="1" fill="white"/>
+        <circle cx="100" cy="54" r="1" fill="white"/>
+        <!-- eyebrows -->
+        <path d="M78,48 Q82,45 86,48" stroke="#555" stroke-width="1.5" fill="none"/>
+        <path d="M94,48 Q98,45 102,48" stroke="#555" stroke-width="1.5" fill="none"/>
+        <!-- smile -->
+        <path d="M83,65 Q90,70 97,65" stroke="#c47a5a" stroke-width="1.5" fill="none"/>
+        <!-- hair -->
+        ${f ? '<path d="M66,40 Q65,20 78,15 Q90,10 102,15 Q115,20 114,40 Q108,28 90,25 Q72,28 66,40Z" fill="#8B0000"/><path d="M66,40 Q60,55 62,70" stroke="#8B0000" stroke-width="8" fill="none" stroke-linecap="round"/><path d="M114,40 Q120,55 118,70" stroke="#8B0000" stroke-width="8" fill="none" stroke-linecap="round"/>' :
+              '<path d="M66,40 Q65,20 78,15 Q90,10 102,15 Q115,20 114,40 Q108,28 90,25 Q72,28 66,40Z" fill="#2a1a6e"/>'}
+        <!-- wizard hat -->
+        <polygon points="90,2 66,44 114,44" fill="#2a1a6e" stroke="#4a2a9e" stroke-width="1.5"/>
+        <rect x="58" y="42" width="64" height="10" rx="5" fill="#3a2a8e" stroke="#4a2a9e" stroke-width="1"/>
+        <text x="82" y="30" font-size="10" fill="#D4A843">✦</text>
+        <!-- sparkles -->
+        <text x="15" y="35" font-size="14">✨</text>
+        <text x="148" y="55" font-size="11">✨</text>
+        <text x="22" y="170" font-size="10">💫</text>
+      </svg>`,
+
+    ivrogne: (f) => `
+      <svg viewBox="0 0 180 200" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="90" cy="105" rx="75" ry="80" fill="rgba(255,107,53,0.07)"/>
+        <!-- body / tunic -->
+        <path d="M52,105 Q45,185 58,198 Q90,188 122,198 Q135,185 128,105 Z" fill="#8B4513" stroke="#6B3413" stroke-width="1.5"/>
+        <!-- stains on tunic -->
+        <circle cx="80" cy="140" r="5" fill="rgba(139,0,0,0.4)"/>
+        <circle cx="95" cy="155" r="4" fill="rgba(139,0,0,0.3)"/>
+        <circle cx="105" cy="138" r="3" fill="rgba(200,100,0,0.4)"/>
+        <!-- belt -->
+        <rect x="52" y="135" width="76" height="10" rx="4" fill="#4A2C1A" stroke="#6B3D22" stroke-width="1"/>
+        <rect x="85" y="133" width="10" height="14" rx="2" fill="#D4A843"/>
+        <!-- arms -->
+        <path d="M52,105 Q30,115 25,155 Q42,148 52,138 Z" fill="#8B4513" stroke="#6B3413" stroke-width="1.5"/>
+        <path d="M128,105 Q150,115 155,155 Q138,148 128,138 Z" fill="#8B4513" stroke="#6B3413" stroke-width="1.5"/>
+        <!-- beer mug -->
+        <rect x="140" y="130" width="22" height="30" rx="4" fill="#D4A843" stroke="#B8860B" stroke-width="1.5"/>
+        <path d="M162,135 Q172,135 172,145 Q172,155 162,155" stroke="#B8860B" stroke-width="2" fill="none"/>
+        <rect x="140" y="130" width="22" height="8" rx="2" fill="white" opacity="0.6"/>
+        <!-- foam drops -->
+        <circle cx="148" cy="126" r="3" fill="white" opacity="0.8"/>
+        <circle cx="155" cy="124" r="2" fill="white" opacity="0.6"/>
+        <!-- hand holding mug -->
+        <circle cx="148" cy="155" r="10" fill="${f?'#FDBCB4':'#FCCBA1'}"/>
+        <!-- other hand up -->
+        <circle cx="28" cy="155" r="9" fill="${f?'#FDBCB4':'#FCCBA1'}"/>
+        <!-- neck + head -->
+        <rect x="80" y="74" width="20" height="32" rx="8" fill="${f?'#FDBCB4':'#FCCBA1'}"/>
+        <ellipse cx="90" cy="60" rx="28" ry="28" fill="${f?'#FDBCB4':'#FCCBA1'}" stroke="${f?'#e0a090':'#DBA87A'}" stroke-width="1.5"/>
+        <!-- rosy cheeks (drunk) -->
+        <ellipse cx="75" cy="65" rx="8" ry="5" fill="rgba(255,100,80,0.35)"/>
+        <ellipse cx="105" cy="65" rx="8" ry="5" fill="rgba(255,100,80,0.35)"/>
+        <!-- eyes — half closed -->
+        <path d="M80,56 Q84,52 88,56" stroke="#333" stroke-width="2" fill="#FCCBA1"/>
+        <path d="M92,56 Q96,52 100,56" stroke="#333" stroke-width="2" fill="#FCCBA1"/>
+        <!-- spiral eyes (dizzy) -->
+        <path d="M83,57 Q85,55 84,57 Q82,59 84,58" stroke="#333" stroke-width="1" fill="none"/>
+        <path d="M96,57 Q98,55 97,57 Q95,59 97,58" stroke="#333" stroke-width="1" fill="none"/>
+        <!-- big grin -->
+        <path d="M80,70 Q90,78 100,70" stroke="#c47a5a" stroke-width="2" fill="rgba(200,100,80,0.2)"/>
+        <!-- hair -->
+        ${f ? '<path d="M62,48 Q65,25 80,18 Q90,14 100,18 Q115,25 118,48 Q108,32 90,30 Q72,32 62,48Z" fill="#8B4513"/>' :
+              '<path d="M62,48 Q65,30 78,22 Q90,18 102,22 Q115,30 118,48 Q110,36 96,34 Q84,33 74,36 Q68,38 62,48Z" fill="#4A2C1A"/>'}
+        <!-- hat (tilted) -->
+        <g transform="rotate(-12, 90, 35)">
+          <rect x="65" y="32" width="50" height="8" rx="4" fill="#2C1810" stroke="#4A2C1A" stroke-width="1"/>
+          <rect x="72" y="10" width="36" height="24" rx="3" fill="#2C1810" stroke="#4A2C1A" stroke-width="1"/>
+          <rect x="72" y="32" width="36" height="4" fill="#D4A843"/>
+        </g>
+        <!-- stars + bubbles -->
+        <text x="20" y="55" font-size="14">⭐</text>
+        <text x="22" y="75" font-size="12">💫</text>
+        <circle cx="165" cy="100" r="4" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1"/>
+        <circle cx="172" cy="88" r="3" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+        <!-- legs -->
+        <rect x="66" y="185" width="22" height="15" rx="5" fill="#3a2a1a" stroke="#555" stroke-width="1"/>
+        <rect x="92" y="185" width="22" height="15" rx="5" fill="#3a2a1a" stroke="#555" stroke-width="1"/>
+      </svg>`,
+
+    villageois: (f) => `
+      <svg viewBox="0 0 180 200" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="90" cy="105" rx="75" ry="80" fill="rgba(122,154,90,0.07)"/>
+        <!-- body / simple tunic -->
+        <path d="M55,105 Q48,185 62,200 L118,200 Q132,185 125,105 Z" fill="#6B8B4A" stroke="#5A7A3A" stroke-width="1.5"/>
+        <!-- apron -->
+        <path d="M72,120 Q72,185 90,190 Q108,185 108,120 Z" fill="#D4C4A0" stroke="#B8A880" stroke-width="1"/>
+        <!-- pocket -->
+        <rect x="78" y="145" width="14" height="12" rx="3" fill="#C4B490" stroke="#B8A880" stroke-width="1"/>
+        <!-- arms -->
+        <path d="M55,105 Q35,118 30,148 Q46,140 55,132 Z" fill="#6B8B4A" stroke="#5A7A3A" stroke-width="1.5"/>
+        <path d="M125,105 Q145,118 150,148 Q134,140 125,132 Z" fill="#6B8B4A" stroke="#5A7A3A" stroke-width="1.5"/>
+        <!-- hands holding basket / loaf -->
+        <circle cx="32" cy="150" r="10" fill="${f?'#FDBCB4':'#FCCBA1'}"/>
+        <circle cx="148" cy="150" r="10" fill="${f?'#FDBCB4':'#FCCBA1'}"/>
+        <!-- bread in left hand -->
+        <ellipse cx="22" cy="155" rx="14" ry="9" fill="#D4A843" stroke="#B8860B" stroke-width="1.5"/>
+        <line x1="12" y1="153" x2="32" y2="153" stroke="#B8860B" stroke-width="1" opacity="0.6"/>
+        <!-- neck -->
+        <rect x="80" y="74" width="20" height="30" rx="8" fill="${f?'#FDBCB4':'#FCCBA1'}"/>
+        <!-- head -->
+        <ellipse cx="90" cy="58" rx="26" ry="27" fill="${f?'#FDBCB4':'#FCCBA1'}" stroke="${f?'#e0a090':'#DBA87A'}" stroke-width="1.5"/>
+        <!-- kind eyes -->
+        <ellipse cx="81" cy="56" rx="5" ry="5.5" fill="white" stroke="#ccc" stroke-width="0.5"/>
+        <ellipse cx="99" cy="56" rx="5" ry="5.5" fill="white" stroke="#ccc" stroke-width="0.5"/>
+        <circle cx="82" cy="57" r="3" fill="#5C4A2A"/>
+        <circle cx="100" cy="57" r="3" fill="#5C4A2A"/>
+        <circle cx="83" cy="55.5" r="1" fill="white"/>
+        <circle cx="101" cy="55.5" r="1" fill="white"/>
+        <!-- brows -->
+        <path d="M77,49 Q81,47 85,49" stroke="#8B6A4A" stroke-width="1.5" fill="none"/>
+        <path d="M95,49 Q99,47 103,49" stroke="#8B6A4A" stroke-width="1.5" fill="none"/>
+        <!-- warm smile -->
+        <path d="M82,68 Q90,75 98,68" stroke="#c47a5a" stroke-width="2" fill="rgba(200,100,80,0.15)" stroke-linecap="round"/>
+        <!-- cheeks -->
+        <ellipse cx="76" cy="66" rx="6" ry="4" fill="rgba(255,160,120,0.3)"/>
+        <ellipse cx="104" cy="66" rx="6" ry="4" fill="rgba(255,160,120,0.3)"/>
+        <!-- hair -->
+        ${f ? '<path d="M64,46 Q65,22 80,16 Q90,12 100,16 Q115,22 116,46 Q108,30 90,27 Q72,30 64,46Z" fill="#8B4513"/><path d="M64,46 Q58,60 60,80" stroke="#8B4513" stroke-width="10" fill="none" stroke-linecap="round"/><path d="M116,46 Q122,60 120,80" stroke="#8B4513" stroke-width="10" fill="none" stroke-linecap="round"/>' :
+              '<path d="M64,46 Q66,28 80,20 Q90,16 100,20 Q114,28 116,46 Q108,32 90,29 Q72,32 64,46Z" fill="#4A2C1A"/>'}
+        <!-- straw hat -->
+        <ellipse cx="90" cy="35" rx="36" ry="8" fill="#D4A843" stroke="#B8860B" stroke-width="1.5"/>
+        <ellipse cx="90" cy="28" rx="22" ry="14" fill="#C49040" stroke="#B8860B" stroke-width="1.5"/>
+        <path d="M68,35 Q90,32 112,35" stroke="#B8860B" stroke-width="1" fill="none"/>
+        <!-- flowers on hat -->
+        <circle cx="75" cy="33" r="4" fill="${f?'#FF69B4':'#FFD700'}"/>
+        <circle cx="75" cy="33" r="2" fill="white"/>
+        <!-- legs -->
+        <rect x="68" y="185" width="20" height="15" rx="5" fill="#3a2a1a" stroke="#555" stroke-width="1"/>
+        <rect x="92" y="185" width="20" height="15" rx="5" fill="#3a2a1a" stroke="#555" stroke-width="1"/>
+        <text x="145" y="45" font-size="14">🌾</text>
+        <text x="148" y="170" font-size="12">🌻</text>
+      </svg>`
+  };
+
+  const builder = chars[charType] || chars.villageois;
+  return builder(isFemme || isSpec);
+}
+function computeResult() {
+  if(state.skipCount > 5) {
+    return {
+      charType: 'villageois',
+      emoji: '👻', title: 'Âme Errante',
+      desc: `${pseudoDisplay()} a fui trop d'épreuves. ${genderPronoun('il')} hante les couloirs de la quête, mystérieux·se et insaisissable… mais aimé·e quand même.`
+    };
+  }
+  const s = state.score;
+  const isFemme = state.gender === 'femme';
+
+  if(s >= 20) {
+    if(state.answers.activites && (state.answers.activites.rando || state.answers.activites.ferrata || state.answers.activites.escalade || state.answers.activites.canyon)) {
+      return {
+        charType: 'chevalier',
+        emoji: '⚔️', title: isFemme ? 'Chevalière' : 'Chevalier',
+        desc: `${pseudoDisplay()} est ${isFemme?'une guerrière née':'un guerrier né'}. ${genderPronoun('il')} fonce dans l'aventure sans calculer le risque, portant l'étendard des 5 ans avec une bravoure absolue. ⚔️`
+      };
+    }
+    return {
+      charType: 'mage',
+      emoji: '✨', title: 'Mage',
+      desc: `${pseudoDisplay()} manie la magie de l'organisation avec brio. ${genderPronoun('il')} sait exactement ce qu'${genderPronoun('il')} veut et comment le manifester. La quête lui doit tout. ✨`
+    };
+  }
+  if(s >= 10) {
+    return {
+      charType: 'ivrogne',
+      emoji: '🍺', title: 'Ivrogne Légendaire',
+      desc: `${pseudoDisplay()} a sa propre philosophie : profiter de l'instant, trinquer avec style, laisser les autres organiser. Un art de vivre élevé au rang de religion. 🍺`
+    };
+  }
+  return {
+    charType: 'villageois',
+    emoji: '🌾', title: isFemme ? 'Villageoise' : 'Villageois',
+    desc: `${pseudoDisplay()} préfère les chemins balisés et le confort rassurant. ${genderPronoun('il')} apportera la bonne humeur, le pain frais et la sagesse au campement. 🌾`
+  };
+}
+
+// ═══════════════════════════════════════════════
+//  EXPORT TO CSV (visible to creator)
+// ═══════════════════════════════════════════════
+function submitResults() {
+  const result = computeResult();
+  const row = {
+    'Nom': state.name,
+    'Pseudo': state.pseudo,
+    'Genre': state.gender,
+    'Nb Participants': state.participantCount,
+    'Dispo Fin Août': state.answers.dispo ? 'Oui' : 'Non',
+    'Motivation': state.answers.motivation || '',
+    'Lieux': state.answers.lieux ? Object.keys(state.answers.lieux).join(', ') : '',
+    'Logement': state.answers.logement ? Object.keys(state.answers.logement).join(', ') : '',
+    'Activités': state.answers.activites ? Object.keys(state.answers.activites).join(', ') : '',
+    'Bouffe': state.answers.bouffe ? Object.keys(state.answers.bouffe).join(', ') : '',
+    'Quête Ultime': state.answers.folie || '',
+    'Message Boîte à Souvenirs': state.answers.memoryMsg || '',
+    'Lieux - Autre': state.answers.lieux ? (state.answers.lieux['_autre_text'] || '') : '',
+    'Logement - Autre': state.answers.logement ? (state.answers.logement['_autre_text'] || '') : '',
+    'Activités - Autre': state.answers.activites ? (state.answers.activites['_autre_text'] || '') : '',
+    'Score': state.score,
+    'Passages': state.skipCount,
+    'Personnage': result.title,
+    'Boîte à Souvenirs': state.memoryBox ? 'Oui' : 'Non',
+    'Date': new Date().toLocaleString('fr-FR')
+  };
+
+  // Build CSV
+  const headers = Object.keys(row);
+  const values = Object.values(row).map(v => `"${String(v).replace(/"/g,'""')}"`);
+  const csv = headers.join(';') + '\n' + values.join(';');
+
+  // Download
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `quete_5ans_${state.name.replace(/\s+/g,'_')}_${Date.now()}.csv`;
+  a.click(); URL.revokeObjectURL(url);
+
+  navigate('submitted');
+}
+
+// ═══════════════════════════════════════════════
+//  STARS & TREES INIT
+// ═══════════════════════════════════════════════
+function initForest() {
+  const starsEl = document.getElementById('stars');
+  for(let i=0; i<80; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random()*2 + 0.5;
+    s.style.cssText = `
+      width:${size}px;height:${size}px;
+      left:${Math.random()*100}%;top:${Math.random()*60}%;
+      --d:${2+Math.random()*4}s;--delay:${Math.random()*4}s;
+    `;
+    starsEl.appendChild(s);
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+initForest();
+render();
+updateProgress();
+</script>
+</body>
+</html>
